@@ -829,6 +829,45 @@ RCT_EXPORT_METHOD(iso15693_writeSingleBlock:(NSDictionary *)options callback:(no
     }
 }
 
+RCT_EXPORT_METHOD(iso15693_writeMultipleBlocks:(NSDictionary *)options callback:(nonnull RCTResponseSenderBlock)callback)
+{
+    if (@available(iOS 13.0, *)) {
+        if (!sessionEx || !sessionEx.connectedTag) {
+            callback(@[@"Not connected", [NSNull null]]);
+            return;
+        }
+        
+        id<NFCISO15693Tag> tag = [sessionEx.connectedTag asNFCISO15693Tag];
+        if (!tag) {
+            callback(@[@"incorrect tag type", [NSNull null]]);
+            return;
+        }
+
+        RequestFlag flags = [[options objectForKey:@"flags"] unsignedIntValue];
+        NSArray<NSData *> *dataBlocks = [self arrayToData:[options mutableArrayValueForKey:@"dataBlocks"]];
+        uint8_t blockNumber = [[options objectForKey:@"blockNumber"] unsignedIntValue];
+        uint8_t blockCount = sizeof dataBlocks;
+        NSRange blockRange = NSMakeRange(
+            blockNumber,
+            blockCount
+        );
+
+        [tag writeMultipleBlocksWithRequestFlags:flags
+                                  blockRange:blockRange
+                                    dataBlocks: dataBlocks
+                           completionHandler:^(NSError *error) {
+            if (error) {
+                callback(@[getErrorMessage(error), [NSNull null]]);
+                return;
+            }
+            
+            callback(@[]);
+        }];
+    } else {
+        callback(@[@"Not support in this device", [NSNull null]]);
+    }
+}
+
 RCT_EXPORT_METHOD(iso15693_lockBlock:(NSDictionary *)options callback:(nonnull RCTResponseSenderBlock)callback)
 {
     if (@available(iOS 13.0, *)) {
@@ -1160,6 +1199,85 @@ RCT_EXPORT_METHOD(iso15693_extendedWriteSingleBlock:(NSDictionary *)options call
         [tag extendedWriteSingleBlockWithRequestFlags:flags
                                   blockNumber:blockNumber
                                     dataBlock: dataBlock
+                           completionHandler:^(NSError *error) {
+            if (error) {
+                callback(@[getErrorMessage(error), [NSNull null]]);
+                return;
+            }
+            
+            callback(@[]);
+        }];
+    } else {
+        callback(@[@"Not support in this device", [NSNull null]]);
+    }
+}
+
+RCT_EXPORT_METHOD(iso15693_extendedReadMultipleBlocks:(NSDictionary *)options callback:(nonnull RCTResponseSenderBlock)callback)
+{
+    if (@available(iOS 13.0, *)) {
+        if (!sessionEx || !sessionEx.connectedTag) {
+            callback(@[@"Not connected", [NSNull null]]);
+            return;
+        }
+
+        id<NFCISO15693Tag> tag = [sessionEx.connectedTag asNFCISO15693Tag];
+        if (!tag) {
+            callback(@[@"incorrect tag type", [NSNull null]]);
+            return;
+        }
+
+        RequestFlag flags = [[options objectForKey:@"flags"] unsignedIntValue];
+        uint16_t blockNumber = [[options objectForKey:@"blockNumber"] unsignedIntValue];
+        uint16_t blockCount = [[options objectForKey:@"blockCount"] unsignedIntValue];
+        NSRange blockRange = NSMakeRange(
+            blockNumber,
+            blockCount
+        );
+
+        [tag extendedReadMultipleBlocksWithRequestFlags:flags
+                                 blockRange:blockRange
+                           completionHandler:^(NSArray<NSData *> *dataBlocks, NSError *error) {
+            if (error) {
+                callback(@[getErrorMessage(error), [NSNull null]]);
+                return;
+            }
+            NSMutableArray *blocks = [NSMutableArray arrayWithCapacity:[dataBlocks count]];
+            [dataBlocks enumerateObjectsUsingBlock:^(NSData *blockData, NSUInteger idx, BOOL *stop) {
+                [blocks addObject:[self dataToArray:blockData]];
+            }];
+            callback(@[[NSNull null], blocks]);
+        }];
+    } else {
+        callback(@[@"Not support in this device", [NSNull null]]);
+    }
+}
+
+RCT_EXPORT_METHOD(iso15693_extendedWriteMultipleBlocks:(NSDictionary *)options callback:(nonnull RCTResponseSenderBlock)callback)
+{
+    if (@available(iOS 13.0, *)) {
+        if (!sessionEx || !sessionEx.connectedTag) {
+            callback(@[@"Not connected", [NSNull null]]);
+            return;
+        }
+        
+        id<NFCISO15693Tag> tag = [sessionEx.connectedTag asNFCISO15693Tag];
+        if (!tag) {
+            callback(@[@"incorrect tag type", [NSNull null]]);
+            return;
+        }
+
+        RequestFlag flags = [[options objectForKey:@"flags"] unsignedIntValue];
+        NSArray<NSData *> *dataBlocks = [self arrayToData:[options mutableArrayValueForKey:@"dataBlocks"]];
+        uint16_t blockNumber = [[options objectForKey:@"blockNumber"] unsignedIntValue];
+        uint8_t blockCount = sizeof dataBlocks;
+        NSRange blockRange = NSMakeRange(
+            blockNumber,
+            blockCount
+        );
+
+        [tag extendedWriteMultipleBlocks:flags
+                                  blockRange:blockRange
+                                    dataBlocks: dataBlocks
                            completionHandler:^(NSError *error) {
             if (error) {
                 callback(@[getErrorMessage(error), [NSNull null]]);

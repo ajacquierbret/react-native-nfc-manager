@@ -71,6 +71,10 @@ class Iso15693HandlerIOS {
     return callNative('iso15693_writeSingleBlock', [{flags, blockNumber, dataBlock}]);
   }
 
+  writeMultipleBlocks({flags, blockNumber, dataBlocks}) {
+    return callNative('iso15693_writeMultipleBlocks', [{flags, blockNumber, dataBlocks}]);
+  }
+
   lockBlock({flags, blockNumber}) {
     return callNative('iso15693_lockBlock', [{flags, blockNumber}]);
   }
@@ -111,8 +115,16 @@ class Iso15693HandlerIOS {
     return callNative('iso15693_extendedReadSingleBlock', [{flags, blockNumber}]);
   }
 
+  extendedReadMultipleBlocks({flags, blockNumber, blockCount}) {
+    return callNative('iso15693_extendedReadMultipleBlocks', [{flags, blockNumber, blockCount}]);
+  }
+
   extendedWriteSingleBlock({flags, blockNumber, dataBlock}) {
     return callNative('iso15693_extendedWriteSingleBlock', [{flags, blockNumber, dataBlock}]);
+  }
+
+  extendedWriteMultipleBlocks({flags, blockNumber, dataBlocks}) {
+    return callNative('iso15693_extendedWriteMultipleBlocks', [{flags, blockNumber, dataBlocks}]);
   }
 
   extendedLockBlock({flags, blockNumber}) {

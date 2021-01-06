@@ -93,7 +93,8 @@ declare module 'react-native-nfc-manager' {
     ) => Promise<{ dsfid: number, afi: number, blockSize: number, blockCount: number, icReference: number}>;
     readSingleBlock: (params: {flags: number, blockNumber: number}) => Promise<number[]>;
     readMultipleBlocks: (params: {flags: number, blockNumber: number, blockCount: number}) => Promise<number[][]>;
-    writeSingleBlock: (params: {flags: number, blockNumber: number, dataBlock: number[]}) => Promise<void>; 
+    writeSingleBlock: (params: {flags: number, blockNumber: number, dataBlock: number[]}) => Promise<void>;
+    writeMultipleBlocks: (params: {flags: number, blockNumber: number, dataBlocks: number[][]}) => Promise<void>;
     lockBlock: (params: {flags: number, blockNumber: number}) => Promise<void>; 
     writeAFI: (params: {flags: number, afi: number}) => Promise<void>; 
     lockAFI: (params: {flags: number}) => Promise<void>; 
@@ -104,8 +105,10 @@ declare module 'react-native-nfc-manager' {
     stayQuite: () => Promise<void>; 
     customCommand: (params: {flags: number, customCommandCode: number, customRequestParameters: number[]}) => Promise<number[]>;
     extendedReadSingleBlock: (params: {flags: number, blockNumber: number}) => Promise<number[]>;
-    extendedWriteSingleBlock: (params: {flags: number, blockNumber: number, dataBlock: number[]}) => Promise<void>; 
-    extendedLockBlock: (params: {flags: number, blockNumber: number}) => Promise<void>; 
+    extendedReadMultipleBlocks: (params: {flags: number, blockNumber: number, blockCount: number}) => Promise<number[][]>;
+    extendedWriteSingleBlock: (params: {flags: number, blockNumber: number, dataBlock: number[]}) => Promise<void>;
+    extendedWriteMultipleBlocks: (params: {flags: number, blockNumber: number, dataBlocks: number[][]}) => Promise<void>;
+    extendedLockBlock: (params: {flags: number, blockNumber: number}) => Promise<void>;
   }
 
   interface NfcManager {
